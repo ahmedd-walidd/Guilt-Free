@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from 'expo-router';
-import { BarChart3, BookOpen, ClipboardCheck, ListChecks, PiggyBank, WalletCards } from 'lucide-react-native';
+import { BarChart3, ClipboardCheck, ListChecks, PiggyBank } from 'lucide-react-native';
 
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { colours } from '../../src/constants/colours';
@@ -35,12 +35,12 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: colours.surface,
           borderTopColor: colours.border,
-          height: 66,
-          paddingTop: 8,
-          paddingBottom: 8,
+          height: 72,
+          paddingTop: 9,
+          paddingBottom: 10,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: '700',
         },
       }}
@@ -69,8 +69,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="afford"
         options={{
-          title: 'Afford',
-          tabBarIcon: ({ color, size }) => <WalletCards color={color} size={size} />,
+          href: null,
         }}
       />
       <Tabs.Screen
@@ -83,8 +82,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="guide"
         options={{
-          title: 'Guide',
-          tabBarIcon: ({ color, size }) => <BookOpen color={color} size={size} />,
+          href: null,
         }}
       />
     </Tabs>

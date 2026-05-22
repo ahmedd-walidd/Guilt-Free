@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from 'expo-router';
-import { BookOpen, LogOut, RefreshCw } from 'lucide-react-native';
+import { BookOpen, LogOut, RefreshCw, WalletCards } from 'lucide-react-native';
 import { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 
@@ -118,20 +118,37 @@ export default function DashboardScreen() {
         <Text style={styles.helper}>A practical score based on the plan you set, not investment advice.</Text>
       </Card>
 
-      <Card style={styles.guideCard}>
-        <View style={styles.guideText}>
-          <Text style={styles.cardTitle}>Rich Life Guide</Text>
-          <Text style={styles.helper}>
-            Learn how Guilt-Free connects your profile, goals, spending checks, and monthly review to conscious spending
-            principles.
-          </Text>
+      <Card style={styles.actionCard}>
+        <Text style={styles.cardTitle}>Next actions</Text>
+        <Text style={styles.helper}>Use these when you need guidance, not as everyday tabs.</Text>
+
+        <View style={styles.actionGrid}>
+          <View style={styles.actionItem}>
+            <View style={styles.actionText}>
+              <Text style={styles.actionTitle}>Can I Afford This?</Text>
+              <Text style={styles.actionCopy}>Check a bigger purchase against your current spending system.</Text>
+            </View>
+            <Button
+              title="Check"
+              variant="secondary"
+              onPress={() => router.push('/(tabs)/afford')}
+              icon={<WalletCards color={colours.primaryDark} size={18} />}
+            />
+          </View>
+
+          <View style={styles.actionItem}>
+            <View style={styles.actionText}>
+              <Text style={styles.actionTitle}>Rich Life Guide</Text>
+              <Text style={styles.actionCopy}>Learn how the app connects to conscious spending principles.</Text>
+            </View>
+            <Button
+              title="Open guide"
+              variant="secondary"
+              onPress={() => router.push('/(tabs)/guide')}
+              icon={<BookOpen color={colours.primaryDark} size={18} />}
+            />
+          </View>
         </View>
-        <Button
-          title="Open guide"
-          variant="secondary"
-          onPress={() => router.push('/(tabs)/guide')}
-          icon={<BookOpen color={colours.primaryDark} size={18} />}
-        />
       </Card>
 
       <View style={styles.grid}>
@@ -261,11 +278,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  guideCard: {
+  actionCard: {
     gap: 12,
   },
-  guideText: {
-    gap: 6,
+  actionGrid: {
+    gap: 10,
+  },
+  actionItem: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colours.border,
+    backgroundColor: colours.input,
+    padding: 12,
+    gap: 10,
+  },
+  actionText: {
+    gap: 4,
+  },
+  actionTitle: {
+    color: colours.text,
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  actionCopy: {
+    color: colours.muted,
+    fontSize: 14,
+    lineHeight: 20,
   },
   inlineHelp: {
     flexDirection: 'row',
