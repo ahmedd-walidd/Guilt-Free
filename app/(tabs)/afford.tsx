@@ -7,12 +7,14 @@ import { z } from 'zod';
 
 import { Button } from '../../src/components/Button';
 import { Card } from '../../src/components/Card';
+import { InfoTooltip } from '../../src/components/InfoTooltip';
 import { Input } from '../../src/components/Input';
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { MoneyAmount } from '../../src/components/MoneyAmount';
 import { Screen } from '../../src/components/Screen';
 import { SectionHeader } from '../../src/components/SectionHeader';
 import { colours } from '../../src/constants/colours';
+import { helpText } from '../../src/constants/helpText';
 import { getErrorMessage } from '../../src/lib/errors';
 import { affordService } from '../../src/services/affordService';
 import { transactionService } from '../../src/services/transactionService';
@@ -108,7 +110,10 @@ export default function AffordScreen() {
 
   return (
     <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void loadTransactions(true)} />}>
-      <SectionHeader title="Can I afford this?" subtitle={`Decision check for ${month.label}`} />
+      <View style={styles.headerWithHelp}>
+        <SectionHeader title="Can I afford this?" subtitle={`Decision check for ${month.label}`} />
+        <InfoTooltip title="Can I Afford This?" body={helpText.canIAffordThis} />
+      </View>
 
       <Card style={styles.formCard}>
         <Controller
@@ -153,6 +158,13 @@ export default function AffordScreen() {
         <Button title="Check purchase" loading={formState.isSubmitting} onPress={handleSubmit(onSubmit)} />
       </Card>
 
+      <Card style={styles.legendCard}>
+        <Text style={styles.noteTitle}>Decision colours</Text>
+        <DecisionLegend title="Green" body={helpText.greenDecision} colour={colours.success} />
+        <DecisionLegend title="Yellow" body={helpText.yellowDecision} colour={colours.warning} />
+        <DecisionLegend title="Red" body={helpText.redDecision} colour={colours.danger} />
+      </Card>
+
       {decisionResult ? (
         <DecisionCard result={decisionResult} currency={profile.currency} />
       ) : (
@@ -162,6 +174,10 @@ export default function AffordScreen() {
             The check uses your profile, current month transactions, guilt-free remaining, buffer, savings target, and
             investment target. It does not recommend assets or investment products.
           </Text>
+          <View style={styles.inlineHelp}>
+            <InfoTooltip title="Buffer" body={helpText.buffer} />
+            <InfoTooltip title="Spending system" body={helpText.spendingSystem} />
+          </View>
         </Card>
       )}
     </Screen>
@@ -183,7 +199,7 @@ function DecisionCard({ result, currency }: { result: AffordDecisionResult; curr
 
       <View style={styles.resultGrid}>
         <ResultMetric title="Guilt-free remaining" amount={result.guiltFreeRemaining} currency={currency} />
-        <ResultMetric title="Buffer budget" amount={result.bufferBudget} currency={currency} />
+        <ResultMetric title="Buffer budget" amount={result.bufferBudget} currency={currency} help={helpText.buffer} />
         <ResultMetric title="Savings shortfall" amount={result.savingsShortfall} currency={currency} />
         <ResultMetric title="Investment shortfall" amount={result.investmentShortfall} currency={currency} />
       </View>
@@ -191,16 +207,35 @@ function DecisionCard({ result, currency }: { result: AffordDecisionResult; curr
   );
 }
 
-function ResultMetric({ title, amount, currency }: { title: string; amount: number; currency: string }) {
+function DecisionLegend({ title, body, colour }: { title: string; body: string; colour: string }) {
+  return (
+    <View style={styles.legendRow}>
+      <View style={[styles.legendDot, { backgroundColor: colour }]} />
+      <Text style={styles.legendTitle}>{title}</Text>
+      <InfoTooltip title={`${title} decision`} body={body} />
+    </View>
+  );
+}
+
+function ResultMetric({ title, amount, currency, help }: { title: string; amount: number; currency: string; help?: string }) {
   return (
     <View style={styles.resultMetric}>
-      <Text style={styles.resultTitle}>{title}</Text>
+      <View style={styles.resultTitleRow}>
+        <Text style={styles.resultTitle}>{title}</Text>
+        {help ? <InfoTooltip title={title} body={help} /> : null}
+      </View>
       <MoneyAmount amount={amount} currency={currency} size="small" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  headerWithHelp: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
   formCard: {
     gap: 14,
   },
@@ -212,6 +247,26 @@ const styles = StyleSheet.create({
   noteCard: {
     gap: 8,
   },
+  legendCard: {
+    gap: 10,
+  },
+  legendRow: {
+    minHeight: 36,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  legendTitle: {
+    flex: 1,
+    color: colours.text,
+    fontSize: 15,
+    fontWeight: '800',
+  },
   noteTitle: {
     color: colours.text,
     fontSize: 17,
@@ -221,6 +276,10 @@ const styles = StyleSheet.create({
     color: colours.muted,
     fontSize: 14,
     lineHeight: 20,
+  },
+  inlineHelp: {
+    flexDirection: 'row',
+    gap: 8,
   },
   decisionCard: {
     gap: 12,
@@ -253,5 +312,12 @@ const styles = StyleSheet.create({
     color: colours.muted,
     fontSize: 12,
     fontWeight: '800',
+    flex: 1,
+  },
+  resultTitleRow: {
+    minHeight: 28,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
 });

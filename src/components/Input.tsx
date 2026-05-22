@@ -7,19 +7,24 @@ import {
   type ViewStyle,
   View,
 } from 'react-native';
+import type { ReactNode } from 'react';
 
 import { colours } from '../constants/colours';
 
 type InputProps = TextInputProps & {
   label: string;
+  labelAccessory?: ReactNode;
   error?: string;
   containerStyle?: StyleProp<ViewStyle>;
 };
 
-export function Input({ label, error, containerStyle, multiline, style, ...props }: InputProps) {
+export function Input({ label, labelAccessory, error, containerStyle, multiline, style, ...props }: InputProps) {
   return (
     <View style={[styles.container, containerStyle]}>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.labelRow}>
+        <Text style={styles.label}>{label}</Text>
+        {labelAccessory}
+      </View>
       <TextInput
         placeholderTextColor={colours.muted}
         multiline={multiline}
@@ -39,6 +44,12 @@ const styles = StyleSheet.create({
     color: colours.text,
     fontSize: 14,
     fontWeight: '700',
+  },
+  labelRow: {
+    minHeight: 28,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   input: {
     minHeight: 48,

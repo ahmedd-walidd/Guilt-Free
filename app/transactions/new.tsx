@@ -8,12 +8,14 @@ import { z } from 'zod';
 import { Button } from '../../src/components/Button';
 import { Card } from '../../src/components/Card';
 import { ChoiceChips } from '../../src/components/ChoiceChips';
+import { InfoTooltip } from '../../src/components/InfoTooltip';
 import { Input } from '../../src/components/Input';
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { Screen } from '../../src/components/Screen';
 import { SectionHeader } from '../../src/components/SectionHeader';
 import { categoriesByType, transactionTypeOptions } from '../../src/constants/categories';
 import { colours } from '../../src/constants/colours';
+import { helpText } from '../../src/constants/helpText';
 import { getErrorMessage } from '../../src/lib/errors';
 import { transactionService } from '../../src/services/transactionService';
 import { useAuthStore } from '../../src/stores/authStore';
@@ -123,6 +125,7 @@ export default function AddTransactionScreen() {
           render={({ field: { onChange, value }, fieldState }) => (
             <ChoiceChips
               label="Type"
+              labelAccessory={<InfoTooltip title="Transaction types" body={helpText.transactionTypes} />}
               options={transactionTypeOptions}
               value={value}
               onChange={(nextType: TransactionType) => {

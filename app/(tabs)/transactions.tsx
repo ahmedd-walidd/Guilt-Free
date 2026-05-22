@@ -7,11 +7,13 @@ import { Button } from '../../src/components/Button';
 import { Card } from '../../src/components/Card';
 import { ChoiceChips } from '../../src/components/ChoiceChips';
 import { EmptyState } from '../../src/components/EmptyState';
+import { InfoTooltip } from '../../src/components/InfoTooltip';
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { MoneyAmount } from '../../src/components/MoneyAmount';
 import { Screen } from '../../src/components/Screen';
 import { SectionHeader } from '../../src/components/SectionHeader';
 import { colours } from '../../src/constants/colours';
+import { helpText } from '../../src/constants/helpText';
 import { transactionTypeOptions } from '../../src/constants/categories';
 import { getErrorMessage } from '../../src/lib/errors';
 import { transactionService } from '../../src/services/transactionService';
@@ -94,6 +96,7 @@ export default function TransactionsScreen() {
     <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void loadTransactions(true)} />}>
       <View style={styles.headerRow}>
         <SectionHeader title="Transactions" subtitle={`${month.label} spending and allocations`} />
+        <InfoTooltip title="Transaction types" body={helpText.transactionTypes} />
         <Button
           title="Add"
           onPress={() => router.push('/transactions/new')}
@@ -103,6 +106,11 @@ export default function TransactionsScreen() {
       </View>
 
       <ChoiceChips options={filterOptions} value={filter} onChange={setFilter} />
+
+      <Card style={styles.guideCard}>
+        <HelpRow title="Guilt-free spending" body={helpText.guiltFree} />
+        <HelpRow title="Waste spending" body={helpText.waste} />
+      </Card>
 
       {error ? (
         <Card style={styles.errorCard}>
@@ -156,6 +164,15 @@ export default function TransactionsScreen() {
   );
 }
 
+function HelpRow({ title, body }: { title: string; body: string }) {
+  return (
+    <View style={styles.helpRow}>
+      <Text style={styles.helpTitle}>{title}</Text>
+      <InfoTooltip title={title} body={body} />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
@@ -165,6 +182,21 @@ const styles = StyleSheet.create({
   },
   addButton: {
     minWidth: 92,
+  },
+  guideCard: {
+    gap: 8,
+  },
+  helpRow: {
+    minHeight: 34,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  helpTitle: {
+    color: colours.text,
+    fontSize: 15,
+    fontWeight: '800',
   },
   errorCard: {
     gap: 12,

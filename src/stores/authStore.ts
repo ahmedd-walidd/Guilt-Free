@@ -42,9 +42,10 @@ export const useAuthStore = create<AuthStore>((set, get) => {
       const profile = await resolveProfile(session);
       set({ session, user: session.user, profile, isLoading: false, error: null });
     } catch (error) {
+      await authService.signOut();
       set({
-        session,
-        user: session.user,
+        session: null,
+        user: null,
         profile: null,
         isLoading: false,
         error: getErrorMessage(error, 'Could not load your profile.'),

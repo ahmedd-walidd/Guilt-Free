@@ -1,15 +1,17 @@
-import { useFocusEffect } from 'expo-router';
-import { LogOut, RefreshCw } from 'lucide-react-native';
+import { router, useFocusEffect } from 'expo-router';
+import { BookOpen, LogOut, RefreshCw } from 'lucide-react-native';
 import { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../src/components/Button';
 import { Card } from '../../src/components/Card';
+import { InfoTooltip } from '../../src/components/InfoTooltip';
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { MoneyAmount } from '../../src/components/MoneyAmount';
 import { Screen } from '../../src/components/Screen';
 import { SectionHeader } from '../../src/components/SectionHeader';
 import { colours } from '../../src/constants/colours';
+import { helpText } from '../../src/constants/helpText';
 import { getErrorMessage } from '../../src/lib/errors';
 import { goalService } from '../../src/services/goalService';
 import { transactionService } from '../../src/services/transactionService';
@@ -103,7 +105,10 @@ export default function DashboardScreen() {
       <Card style={styles.scoreCard}>
         <View style={styles.scoreTop}>
           <View>
-            <Text style={styles.kicker}>Money score</Text>
+            <View style={styles.inlineHelp}>
+              <Text style={styles.kicker}>Money score</Text>
+              <InfoTooltip title="Money score" body={helpText.moneyScore} />
+            </View>
             <Text style={styles.score}>{moneyScore}</Text>
           </View>
           <View style={styles.scoreBadge}>
@@ -113,31 +118,62 @@ export default function DashboardScreen() {
         <Text style={styles.helper}>A practical score based on the plan you set, not investment advice.</Text>
       </Card>
 
+      <Card style={styles.guideCard}>
+        <View style={styles.guideText}>
+          <Text style={styles.cardTitle}>Rich Life Guide</Text>
+          <Text style={styles.helper}>
+            Learn how Guilt-Free connects your profile, goals, spending checks, and monthly review to conscious spending
+            principles.
+          </Text>
+        </View>
+        <Button
+          title="Open guide"
+          variant="secondary"
+          onPress={() => router.push('/(tabs)/guide')}
+          icon={<BookOpen color={colours.primaryDark} size={18} />}
+        />
+      </Card>
+
       <View style={styles.grid}>
-        <MetricCard title="Monthly income" amount={profile.monthly_income} currency={profile.currency} />
-        <MetricCard title="Fixed costs budget" amount={budgets.fixedCosts} currency={profile.currency} />
-        <MetricCard title="Investment budget" amount={budgets.investments} currency={profile.currency} />
-        <MetricCard title="Savings budget" amount={budgets.savings} currency={profile.currency} />
-        <MetricCard title="Guilt-free budget" amount={budgets.guiltFree} currency={profile.currency} />
-        <MetricCard title="Buffer budget" amount={budgets.buffer} currency={profile.currency} />
+        <MetricCard title="Monthly income" amount={profile.monthly_income} currency={profile.currency} help={helpText.monthlyIncome} />
+        <MetricCard title="Fixed costs budget" amount={budgets.fixedCosts} currency={profile.currency} help={helpText.fixedCosts} />
+        <MetricCard title="Investment budget" amount={budgets.investments} currency={profile.currency} help={helpText.investments} />
+        <MetricCard title="Savings budget" amount={budgets.savings} currency={profile.currency} help={helpText.savings} />
+        <MetricCard title="Guilt-free budget" amount={budgets.guiltFree} currency={profile.currency} help={helpText.guiltFree} />
+        <MetricCard title="Buffer budget" amount={budgets.buffer} currency={profile.currency} help={helpText.buffer} />
       </View>
 
       <Card style={styles.cardStack}>
         <Text style={styles.cardTitle}>This month</Text>
         <MetricRow title="Guilt-free used" amount={summary.guiltFreeSpent} currency={profile.currency} />
-        <MetricRow title="Guilt-free remaining" amount={guiltFreeRemaining} currency={profile.currency} tone="success" />
+        <MetricRow
+          title="Guilt-free remaining"
+          amount={guiltFreeRemaining}
+          currency={profile.currency}
+          tone="success"
+          help={helpText.guiltFree}
+        />
         <MetricRow title="Total saved" amount={summary.saved} currency={profile.currency} />
         <MetricRow title="Total invested" amount={summary.invested} currency={profile.currency} />
-        <MetricRow title="Waste spending" amount={summary.waste} currency={profile.currency} tone={summary.waste > 0 ? 'danger' : 'default'} />
+        <MetricRow
+          title="Waste spending"
+          amount={summary.waste}
+          currency={profile.currency}
+          tone={summary.waste > 0 ? 'danger' : 'default'}
+          help={helpText.waste}
+        />
       </Card>
     </Screen>
   );
 }
 
-function MetricCard({ title, amount, currency }: { title: string; amount: number; currency: string }) {
+function MetricCard({ title, amount, currency, help }: { title: string; amount: number; currency: string; help?: string }) {
   return (
     <Card style={styles.metricCard}>
-      <Text style={styles.metricTitle}>{title}</Text>
+      <View style={styles.inlineHelp}>
+        <Text style={styles.metricTitle}>{title}</Text>
+        {help ? <InfoTooltip title={title} body={help} /> : null}
+      </View>
       <MoneyAmount amount={amount} currency={currency} size="regular" />
     </Card>
   );
@@ -148,15 +184,20 @@ function MetricRow({
   amount,
   currency,
   tone = 'default',
+  help,
 }: {
   title: string;
   amount: number;
   currency: string;
   tone?: 'default' | 'success' | 'danger';
+  help?: string;
 }) {
   return (
     <View style={styles.metricRow}>
-      <Text style={styles.rowTitle}>{title}</Text>
+      <View style={styles.rowTitleWrap}>
+        <Text style={styles.rowTitle}>{title}</Text>
+        {help ? <InfoTooltip title={title} body={help} /> : null}
+      </View>
       <MoneyAmount amount={amount} currency={currency} size="small" tone={tone} />
     </View>
   );
@@ -220,6 +261,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
+  guideCard: {
+    gap: 12,
+  },
+  guideText: {
+    gap: 6,
+  },
+  inlineHelp: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -259,5 +312,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     flex: 1,
+  },
+  rowTitleWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
 });

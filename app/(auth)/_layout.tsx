@@ -1,13 +1,19 @@
 import { Redirect, Stack } from 'expo-router';
 
 import { LoadingScreen } from '../../src/components/LoadingScreen';
+import { useTutorialStatus } from '../../src/hooks/useTutorialStatus';
 import { useAuthStore } from '../../src/stores/authStore';
 
 export default function AuthLayout() {
   const { isLoading, session, profile } = useAuthStore();
+  const hasCompletedTutorial = useTutorialStatus();
 
-  if (isLoading) {
+  if (isLoading || hasCompletedTutorial === null) {
     return <LoadingScreen />;
+  }
+
+  if (!hasCompletedTutorial) {
+    return <Redirect href="/tutorial" />;
   }
 
   if (session && profile?.has_completed_onboarding) {

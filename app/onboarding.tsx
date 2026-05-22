@@ -7,11 +7,14 @@ import { z } from 'zod';
 
 import { Button } from '../src/components/Button';
 import { Card } from '../src/components/Card';
+import { InfoTooltip } from '../src/components/InfoTooltip';
 import { Input } from '../src/components/Input';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import { Screen } from '../src/components/Screen';
 import { SectionHeader } from '../src/components/SectionHeader';
 import { colours } from '../src/constants/colours';
+import { helpText } from '../src/constants/helpText';
+import { useTutorialStatus } from '../src/hooks/useTutorialStatus';
 import { getErrorMessage } from '../src/lib/errors';
 import { upsertProfile } from '../src/services/profileService';
 import { useAuthStore } from '../src/stores/authStore';
@@ -67,6 +70,7 @@ function defaultsFromProfile(profile: Profile | null): OnboardingForm {
 
 export default function OnboardingScreen() {
   const { isLoading, session, user, profile, setProfile } = useAuthStore();
+  const hasCompletedTutorial = useTutorialStatus();
   const [formError, setFormError] = useState<string | null>(null);
   const { control, handleSubmit, formState, reset, watch } = useForm<OnboardingForm>({
     resolver: zodResolver(onboardingSchema),
@@ -78,12 +82,16 @@ export default function OnboardingScreen() {
     reset(defaultsFromProfile(profile));
   }, [profile, reset]);
 
-  if (isLoading) {
+  if (isLoading || hasCompletedTutorial === null) {
     return <LoadingScreen />;
   }
 
   if (!session || !user) {
     return <Redirect href="/(auth)/sign-in" />;
+  }
+
+  if (!hasCompletedTutorial) {
+    return <Redirect href="/tutorial" />;
   }
 
   const percentageTotal =
@@ -128,6 +136,7 @@ export default function OnboardingScreen() {
           render={({ field: { onBlur, onChange, value }, fieldState }) => (
             <Input
               label="Monthly income"
+              labelAccessory={<InfoTooltip title="Monthly income" body={helpText.monthlyIncome} />}
               keyboardType="decimal-pad"
               onBlur={onBlur}
               onChangeText={onChange}
@@ -165,6 +174,7 @@ export default function OnboardingScreen() {
           render={({ field: { onBlur, onChange, value }, fieldState }) => (
             <Input
               label="Fixed costs"
+              labelAccessory={<InfoTooltip title="Fixed costs" body={helpText.fixedCosts} />}
               keyboardType="decimal-pad"
               onBlur={onBlur}
               onChangeText={onChange}
@@ -180,6 +190,7 @@ export default function OnboardingScreen() {
           render={({ field: { onBlur, onChange, value }, fieldState }) => (
             <Input
               label="Investments"
+              labelAccessory={<InfoTooltip title="Investments" body={helpText.investments} />}
               keyboardType="decimal-pad"
               onBlur={onBlur}
               onChangeText={onChange}
@@ -195,6 +206,7 @@ export default function OnboardingScreen() {
           render={({ field: { onBlur, onChange, value }, fieldState }) => (
             <Input
               label="Savings"
+              labelAccessory={<InfoTooltip title="Savings" body={helpText.savings} />}
               keyboardType="decimal-pad"
               onBlur={onBlur}
               onChangeText={onChange}
@@ -210,6 +222,7 @@ export default function OnboardingScreen() {
           render={({ field: { onBlur, onChange, value }, fieldState }) => (
             <Input
               label="Guilt-free"
+              labelAccessory={<InfoTooltip title="Guilt-free spending" body={helpText.guiltFree} />}
               keyboardType="decimal-pad"
               onBlur={onBlur}
               onChangeText={onChange}
@@ -225,6 +238,7 @@ export default function OnboardingScreen() {
           render={({ field: { onBlur, onChange, value }, fieldState }) => (
             <Input
               label="Buffer"
+              labelAccessory={<InfoTooltip title="Buffer" body={helpText.buffer} />}
               keyboardType="decimal-pad"
               onBlur={onBlur}
               onChangeText={onChange}

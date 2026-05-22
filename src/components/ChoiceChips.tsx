@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { ReactNode } from 'react';
 
 import { colours } from '../constants/colours';
 
@@ -9,16 +10,29 @@ type ChoiceOption<T extends string> = {
 
 type ChoiceChipsProps<T extends string> = {
   label?: string;
+  labelAccessory?: ReactNode;
   options: ChoiceOption<T>[];
   value: T;
   onChange: (value: T) => void;
   error?: string;
 };
 
-export function ChoiceChips<T extends string>({ label, options, value, onChange, error }: ChoiceChipsProps<T>) {
+export function ChoiceChips<T extends string>({
+  label,
+  labelAccessory,
+  options,
+  value,
+  onChange,
+  error,
+}: ChoiceChipsProps<T>) {
   return (
     <View style={styles.container}>
-      {label ? <Text style={styles.label}>{label}</Text> : null}
+      {label ? (
+        <View style={styles.labelRow}>
+          <Text style={styles.label}>{label}</Text>
+          {labelAccessory}
+        </View>
+      ) : null}
       <View style={styles.options}>
         {options.map((option) => {
           const selected = option.value === value;
@@ -49,6 +63,12 @@ const styles = StyleSheet.create({
     color: colours.text,
     fontSize: 14,
     fontWeight: '700',
+  },
+  labelRow: {
+    minHeight: 28,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   options: {
     flexDirection: 'row',

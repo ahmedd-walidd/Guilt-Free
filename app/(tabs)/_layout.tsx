@@ -1,15 +1,21 @@
 import { Redirect, Tabs } from 'expo-router';
-import { BarChart3, ClipboardCheck, ListChecks, PiggyBank, WalletCards } from 'lucide-react-native';
+import { BarChart3, BookOpen, ClipboardCheck, ListChecks, PiggyBank, WalletCards } from 'lucide-react-native';
 
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { colours } from '../../src/constants/colours';
+import { useTutorialStatus } from '../../src/hooks/useTutorialStatus';
 import { useAuthStore } from '../../src/stores/authStore';
 
 export default function TabsLayout() {
   const { isLoading, session, profile } = useAuthStore();
+  const hasCompletedTutorial = useTutorialStatus();
 
-  if (isLoading) {
+  if (isLoading || hasCompletedTutorial === null) {
     return <LoadingScreen />;
+  }
+
+  if (!hasCompletedTutorial) {
+    return <Redirect href="/tutorial" />;
   }
 
   if (!session) {
@@ -72,6 +78,13 @@ export default function TabsLayout() {
         options={{
           title: 'Review',
           tabBarIcon: ({ color, size }) => <ClipboardCheck color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="guide"
+        options={{
+          title: 'Guide',
+          tabBarIcon: ({ color, size }) => <BookOpen color={color} size={size} />,
         }}
       />
     </Tabs>
